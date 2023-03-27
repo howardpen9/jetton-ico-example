@@ -90,6 +90,8 @@ Argument: value
 135: Code of a contract was not found
 136: Invalid address
 137: Masterchain support is not enabled for this contract
+1524: out of minting period
+3172: TON is not enough...
 4159: Invalid value!!
 4429: Invalid sender
 13650: Invalid bounced message
