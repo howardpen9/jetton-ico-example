@@ -788,6 +788,8 @@ const JettonWallet_errors: { [key: number]: { message: string } } = {
     135: { message: `Code of a contract was not found` },
     136: { message: `Invalid address` },
     137: { message: `Masterchain support is not enabled for this contract` },
+    1524: { message: `out of minting period` },
+    3172: { message: `TON is not enough...` },
     4159: { message: `Invalid value!!` },
     4429: { message: `Invalid sender` },
     13650: { message: `Invalid bounced message` },

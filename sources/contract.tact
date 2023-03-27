@@ -18,47 +18,53 @@ contract jetton_minter {
     const minTonsForStorage: Int = ton("0.02");
     const gasConsumption: Int = ton("0.02");
     owner_address: Address;
-    total_supply: Int as uint32;
+    total_supply: Int as uint128 = 0;
     content: Cell;
     mintable: Bool;
+    weight: Int;
 
-    price_weight: Int as uint32; 
-
-    tempValue: Int as uint32 = 0;
-
-    init(owner_address: Address, content: Cell, price_weight: Int) {
+    days_expire: Int;
+    start_unix: Int;
+    
+    init(owner_address: Address, content: Cell, weight: Int, days_expire: Int) {
         self.owner_address = owner_address;
         self.total_supply = 0;
         self.content = content;
-        self.price_weight = price_weight;
+        self.weight = weight;
         self.mintable = false;
+        self.days_expire = days_expire;
+        self.start_unix = 1670000000; // Unix check on https://www.unixtimestamp.com/
     }
 
     receive(msg: Mint) {
         let ctx: Context = context(); 
+        require((now() - self.start_unix) / 86400 <= self.days_expire , "out of minting period");
         self.mint(ctx.sender, msg.amount);
+    }
+
+    get fun get_end_date(): Int {
+        return self.start_unix + 86400 * self.days_expire;
     }
 
     fun mint(to: Address, amount: Int) {
         let ctx: Context = context(); 
         let msgValue: Int = self.msgValue(ctx.value);
 
-        let jetton_amount: Int =  amount * self.price_weight; 
-        self.tempValue = jetton_amount;
-        // let fee: Int = amount * 15 / 1000; // 1.5%         // PS: ctx.value * self.price_weight == amount
+        let jetton_amount: Int =  amount * self.weight;     
+        let fee: Int = amount * 15 / 1000; // 1.5%  of TON     
+        require(msgValue >= amount + fee, "TON is not enough...");
     
-        // require(msgValue >= amount + fee, "TON is not enough...");
         self.total_supply = self.total_supply + jetton_amount;
 
         let winit: StateInit = self.getJettonWalletInit(to);
         send(SendParameters{
             to: contractAddress(winit), 
-            value: msgValue - amount,
+            value: msgValue - amount - fee,
             bounce: true,
             mode: SendPayGasSeparately,
             body: TokenTransferInternal{ 
                 queryId: 0,
-                amount: amount,
+                amount: jetton_amount,
                 from: myAddress(),
                 response_destination: to,
                 forward_ton_amount: 0,
@@ -69,7 +75,7 @@ contract jetton_minter {
         });
     }
 
-    receive("W") {
+    receive("Withdraw") {
         let ctx: Context = context(); 
         require(ctx.sender == self.owner_address, "not admin");
         send(SendParameters{
@@ -110,9 +116,9 @@ contract jetton_minter {
         return msgValue;
     }
 
-    get fun tempValue(): Int {
-        return self.tempValue;
-    }
+    // get fun tempValue(): Int {
+    //     return self.tempValue;
+    // }
 }
 
 

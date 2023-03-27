@@ -1,6 +1,6 @@
 # TACT Compilation Report
 Contract: jetton_minter
-BOC Size: 1631 bytes
+BOC Size: 1742 bytes
 
 # Types
 Total Types: 13
@@ -60,12 +60,12 @@ Signature: `JettonWalletData{balance:int257,owner:address,master:address,walletC
 # Get Methods
 Total Get Methods: 3
 
+## get_end_date
+
 ## get_jetton_data
 
 ## get_wallet_address
 Argument: owner
-
-## tempValue
 
 # Error Codes
 2: Stack undeflow
@@ -92,6 +92,8 @@ Argument: owner
 135: Code of a contract was not found
 136: Invalid address
 137: Masterchain support is not enabled for this contract
+1524: out of minting period
+3172: TON is not enough...
 4159: Invalid value!!
 4429: Invalid sender
 13650: Invalid bounced message

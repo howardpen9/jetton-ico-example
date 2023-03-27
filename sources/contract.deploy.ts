@@ -32,10 +32,12 @@ let deploy_address = Address.parse("");
     let init = await jetton_minter.init(
         deploy_address,
         content,
-        10000n
+        25000n,
+        180n,  // after x days to end of selling
     );
+
     let address = contractAddress(0, init);
-    let deployAmount = toNano("1");
+    let deployAmount = toNano("0.75");
     let testnet = true;
 
     // Print basics

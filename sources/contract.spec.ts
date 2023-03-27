@@ -1,4 +1,4 @@
-import { fromNano, toNano } from "ton";
+import { fromNano, toNano, beginCell } from "ton";
 import { ContractSystem } from "@tact-lang/emulator";
 import { jetton_minter } from "./output/sample_jetton_minter";
 import { buildOnchainMetadata } from "./utils/jetton-helpers";
@@ -17,26 +17,29 @@ describe("contract", () => {
         let system = await ContractSystem.create();
         let owner = system.treasure("owner");
         let nonOwner = system.treasure("non-owner");
-        let contract = system.open(await jetton_minter.fromInit(
-            owner.address, 
-            content, 
-            10n  // Multiplier
-          ));
 
+        // let dataCell = beginCell().storeCoins(10000).endCell();
+
+        let contract = system.open(
+            await jetton_minter.fromInit(
+                owner.address,
+                content,
+                2500n, // multiplier
+                14n // after 14 days close the selling
+            )
+        );
         system.name(contract.address, "main_contract");
         let track = system.track(contract);
-
         await contract.send(
             owner,
-            { value: toNano(2) }, // The Gas you pay 
+            { value: toNano(3) }, // The Gas you pay
             {
                 $$type: "Mint",
-                amount: toNano(1), // 1 TON
+                amount: toNano("1"), // 1 TON
             }
         );
-
         await system.run();
-        expect(await contract.getTempValue()).toMatchInlineSnapshot(`0n`);
+        // expect(await contract.getTempValue()).toMatchInlineSnapshot(`2500000000000n`);
         expect(track.collect()).toMatchInlineSnapshot(`
             [
               {
@@ -56,27 +59,28 @@ describe("contract", () => {
                       "from": "@treasure(owner)",
                       "to": "@main_contract",
                       "type": "internal",
-                      "value": 2000000000n,
+                      "value": 3000000000n,
                     },
                   },
                   {
-                    "$type": "failed",
-                    "errorCode": 5,
-                    "errorMessage": "Integer out of expected range",
+                    "$type": "processed",
+                    "gasUsed": 20446n,
                   },
                   {
-                    "$type": "sent-bounced",
-                    "message": {
-                      "body": {
-                        "cell": "x{FFFFFFFF01FB345B00000000000000000000000000000000000000000000000000000000}",
-                        "type": "cell",
+                    "$type": "sent",
+                    "messages": [
+                      {
+                        "body": {
+                          "cell": "x{178D4519000000000000000060246139CA80080005F0CE5168A2D2E2DD7020977B6666F0A17998CEF5ECB378E20172C05702FB1100023EDC525573FCB04AE638BEAD1B62BCD1ED2E0E721E32EDB4D4FE2E722CE07702_}",
+                          "type": "cell",
+                        },
+                        "bounce": true,
+                        "from": "@main_contract",
+                        "to": "kQDsovGhtQIn7YE2LigiHXCIhHOrW3XhXyOuzVS9hLkFUFtH",
+                        "type": "internal",
+                        "value": 1945000000n,
                       },
-                      "bounce": false,
-                      "from": "@main_contract",
-                      "to": "@treasure(owner)",
-                      "type": "internal",
-                      "value": 1979547000n,
-                    },
+                    ],
                   },
                 ],
               },
@@ -84,7 +88,7 @@ describe("contract", () => {
         `);
         // 0.960 000 000n
         // Check counter
-        expect(await contract.getTempValue()).toMatchInlineSnapshot(`0n`);
+        expect(await contract.getTempValue()).toMatchInlineSnapshot(`2500000000000n`);
 
         // Non-owner
         // await contract.send(nonOwner, { value: toNano(1) }, "increment");

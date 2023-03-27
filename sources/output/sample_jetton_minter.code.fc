@@ -150,25 +150,30 @@ cell __gen_writecell_TokenTransferInternal((int, int, slice, slice, int, slice) 
     return __gen_write_TokenTransferInternal(begin_cell(), v).end_cell();
 }
 
-builder __gen_write_jetton_minter(builder build_0, (slice, int, cell, int, int, int) v) inline {
-    var (v'owner_address, v'total_supply, v'content, v'mintable, v'price_weight, v'tempValue) = v;
+builder __gen_write_jetton_minter(builder build_0, (slice, int, cell, int, int, int, int) v) inline {
+    var (v'owner_address, v'total_supply, v'content, v'mintable, v'weight, v'days_expire, v'start_unix) = v;
     build_0 = __tact_store_address(build_0, v'owner_address);
-    build_0 = build_0.store_uint(v'total_supply, 32);
+    build_0 = build_0.store_uint(v'total_supply, 128);
     build_0 = build_0.store_ref(v'content);
     build_0 = build_0.store_int(v'mintable, 1);
-    build_0 = build_0.store_uint(v'price_weight, 32);
-    build_0 = build_0.store_uint(v'tempValue, 32);
+    build_0 = build_0.store_int(v'weight, 257);
+    build_0 = build_0.store_int(v'days_expire, 257);
+    var build_1 = begin_cell();
+    build_1 = build_1.store_int(v'start_unix, 257);
+    build_0 = store_ref(build_0, build_1.end_cell());
     return build_0;
 }
 
-(slice, ((slice, int, cell, int, int, int))) __gen_read_jetton_minter(slice sc_0) inline {
+(slice, ((slice, int, cell, int, int, int, int))) __gen_read_jetton_minter(slice sc_0) inline {
     var v'owner_address = sc_0~__tact_load_address();
-    var v'total_supply = sc_0~load_uint(32);
+    var v'total_supply = sc_0~load_uint(128);
     var v'content = sc_0~load_ref();
     var v'mintable = sc_0~load_int(1);
-    var v'price_weight = sc_0~load_uint(32);
-    var v'tempValue = sc_0~load_uint(32);
-    return (sc_0, (v'owner_address, v'total_supply, v'content, v'mintable, v'price_weight, v'tempValue));
+    var v'weight = sc_0~load_int(257);
+    var v'days_expire = sc_0~load_int(257);
+    slice sc_1 = sc_0~load_ref().begin_parse();
+    var v'start_unix = sc_1~load_int(257);
+    return (sc_0, (v'owner_address, v'total_supply, v'content, v'mintable, v'weight, v'days_expire, v'start_unix));
 }
 
 _ __gen_StateInit_get_code((cell, cell) v) inline {
@@ -181,11 +186,12 @@ _ __gen_StateInit_get_code((cell, cell) v) inline {
     return (v'totalSupply, v'mintable, v'owner, v'content, v'walletCode);
 }
 
-(slice, ((slice, cell, int))) __gen_read_$init$jetton_minter(slice sc_0) inline {
+(slice, ((slice, cell, int, int))) __gen_read_$init$jetton_minter(slice sc_0) inline {
     var v'owner_address = sc_0~__tact_load_address();
     var v'content = sc_0~load_ref();
-    var v'price_weight = sc_0~load_int(257);
-    return (sc_0, (v'owner_address, v'content, v'price_weight));
+    var v'weight = sc_0~load_int(257);
+    var v'days_expire = sc_0~load_int(257);
+    return (sc_0, (v'owner_address, v'content, v'weight, v'days_expire));
 }
 
 builder __gen_write_$init$JettonWallet(builder build_0, (slice, slice) v) inline {
@@ -195,17 +201,19 @@ builder __gen_write_$init$JettonWallet(builder build_0, (slice, slice) v) inline
     return build_0;
 }
 
-(slice, int, cell, int, int, int) $__gen_jetton_minter_init(slice $owner_address, cell $content, int $price_weight) impure inline_ref {
-    var (($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'price_weight, $self'tempValue)) = (null(), null(), null(), null(), null(), 0);
+(slice, int, cell, int, int, int, int) $__gen_jetton_minter_init(slice $owner_address, cell $content, int $weight, int $days_expire) impure inline_ref {
+    var (($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'weight, $self'days_expire, $self'start_unix)) = (null(), 0, null(), null(), null(), null(), null());
     $self'owner_address = $owner_address;
     $self'total_supply = 0;
     $self'content = $content;
-    $self'price_weight = $price_weight;
+    $self'weight = $weight;
     $self'mintable = false;
-    return ($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'price_weight, $self'tempValue);
+    $self'days_expire = $days_expire;
+    $self'start_unix = 1670000000;
+    return ($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'weight, $self'days_expire, $self'start_unix);
 }
 
-(slice, int, cell, int, int, int) __gen_load_jetton_minter() impure inline {
+(slice, int, cell, int, int, int, int) __gen_load_jetton_minter() impure inline {
     slice $sc = get_data().begin_parse();
     __tact_context_sys = $sc~load_ref();
     int $loaded = $sc~load_int(1);
@@ -214,13 +222,13 @@ builder __gen_write_$init$JettonWallet(builder build_0, (slice, slice) v) inline
     } else {
         ;; Allow only workchain deployments
         throw_unless(137, my_address().preload_uint(11) == 1024);
-        (slice owner_address, cell content, int price_weight) = $sc~__gen_read_$init$jetton_minter();
+        (slice owner_address, cell content, int weight, int days_expire) = $sc~__gen_read_$init$jetton_minter();
         $sc.end_parse();
-        return $__gen_jetton_minter_init(owner_address, content, price_weight);
+        return $__gen_jetton_minter_init(owner_address, content, weight, days_expire);
     }
 }
 
-() __gen_store_jetton_minter((slice, int, cell, int, int, int) v) impure inline {
+() __gen_store_jetton_minter((slice, int, cell, int, int, int, int) v) impure inline {
     builder b = begin_cell();
     b = b.store_ref(__tact_context_sys);
     b = b.store_int(true, 1);
@@ -299,6 +307,17 @@ cell $__gen_String_asComment(slice $self) impure inline_ref {
     return __tact_string_builder_end($b);
 }
 
+int $__gen_jetton_minter_get_end_date((slice, int, cell, int, int, int, int) $self) impure inline_ref {
+    var (($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'weight, $self'days_expire, $self'start_unix)) = $self;
+    return ($self'start_unix + (86400 * $self'days_expire));
+}
+
+_ $__gen_get_get_end_date() method_id(102605) {
+    var self = __gen_load_jetton_minter();
+    var res = $__gen_jetton_minter_get_end_date(self);
+    return res;
+}
+
 ((int, slice, int, int, cell, cell, cell)) __gen_constructor_SendParameters$to_value_bounce_mode_body_code_data(slice to, int value, int bounce, int mode, cell body, cell code, cell data) inline {
     return (bounce, to, value, mode, body, code, data);
 }
@@ -307,12 +326,12 @@ cell $__gen_String_asComment(slice $self) impure inline_ref {
     return (queryId, amount, from, response_destination, forward_ton_amount, forward_payload);
 }
 
-((slice, int, cell, int, int, int), int) $__gen_jetton_minter_msgValue((slice, int, cell, int, int, int) $self, int $msgValue) impure inline_ref {
-    var (($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'price_weight, $self'tempValue)) = $self;
+((slice, int, cell, int, int, int, int), int) $__gen_jetton_minter_msgValue((slice, int, cell, int, int, int, int) $self, int $msgValue) impure inline_ref {
+    var (($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'weight, $self'days_expire, $self'start_unix)) = $self;
     int $tonBalanceBeforeMsg = (__tact_my_balance() - $msgValue);
     int $storageFee = (20000000 - min($tonBalanceBeforeMsg, 20000000));
     $msgValue = ($msgValue - ($storageFee + 20000000));
-    return (($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'price_weight, $self'tempValue), $msgValue);
+    return (($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'weight, $self'days_expire, $self'start_unix), $msgValue);
 }
 
 (cell, cell) $__gen_JettonWallet_init_child(cell sys', slice $master, slice $owner) {
@@ -332,30 +351,31 @@ cell $__gen_String_asComment(slice $self) impure inline_ref {
     return (mine, b.end_cell());
 }
 
-((slice, int, cell, int, int, int), (cell, cell)) $__gen_jetton_minter_getJettonWalletInit((slice, int, cell, int, int, int) $self, slice $address) impure inline_ref {
-    var (($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'price_weight, $self'tempValue)) = $self;
-    return (($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'price_weight, $self'tempValue), $__gen_JettonWallet_init_child(__tact_context_sys, my_address(), $address));
+((slice, int, cell, int, int, int, int), (cell, cell)) $__gen_jetton_minter_getJettonWalletInit((slice, int, cell, int, int, int, int) $self, slice $address) impure inline_ref {
+    var (($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'weight, $self'days_expire, $self'start_unix)) = $self;
+    return (($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'weight, $self'days_expire, $self'start_unix), $__gen_JettonWallet_init_child(__tact_context_sys, my_address(), $address));
 }
 
-((slice, int, cell, int, int, int), ()) $__gen_jetton_minter_mint((slice, int, cell, int, int, int) $self, slice $to, int $amount) impure inline_ref {
-    var (($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'price_weight, $self'tempValue)) = $self;
+((slice, int, cell, int, int, int, int), ()) $__gen_jetton_minter_mint((slice, int, cell, int, int, int, int) $self, slice $to, int $amount) impure inline_ref {
+    var (($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'weight, $self'days_expire, $self'start_unix)) = $self;
     var ($ctx'bounced, $ctx'sender, $ctx'value, $ctx'raw) = __tact_context_get();
-    int $msgValue = ($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'price_weight, $self'tempValue)~$__gen_jetton_minter_msgValue($ctx'value);
-    int $jetton_amount = ($amount * $self'price_weight);
-    $self'tempValue = $jetton_amount;
+    int $msgValue = ($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'weight, $self'days_expire, $self'start_unix)~$__gen_jetton_minter_msgValue($ctx'value);
+    int $jetton_amount = ($amount * $self'weight);
+    int $fee = (($amount * 15) / 1000);
+    throw_unless(3172, ($msgValue >= ($amount + $fee)));
     $self'total_supply = ($self'total_supply + $jetton_amount);
-    var ($winit'code, $winit'data) = ($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'price_weight, $self'tempValue)~$__gen_jetton_minter_getJettonWalletInit($to);
-    $send(__gen_constructor_SendParameters$to_value_bounce_mode_body_code_data($contractAddress(($winit'code, $winit'data)), ($msgValue - $amount), true, 1, __gen_writecell_TokenTransferInternal(__gen_constructor_TokenTransferInternal$queryId_amount_from_response_destination_forward_ton_amount_forward_payload(0, $amount, my_address(), $to, 0, $emptySlice())), $winit'code, $winit'data));
-    return (($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'price_weight, $self'tempValue), ());
+    var ($winit'code, $winit'data) = ($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'weight, $self'days_expire, $self'start_unix)~$__gen_jetton_minter_getJettonWalletInit($to);
+    $send(__gen_constructor_SendParameters$to_value_bounce_mode_body_code_data($contractAddress(($winit'code, $winit'data)), (($msgValue - $amount) - $fee), true, 1, __gen_writecell_TokenTransferInternal(__gen_constructor_TokenTransferInternal$queryId_amount_from_response_destination_forward_ton_amount_forward_payload(0, $jetton_amount, my_address(), $to, 0, $emptySlice())), $winit'code, $winit'data));
+    return (($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'weight, $self'days_expire, $self'start_unix), ());
 }
 
 ((int, int, slice, cell, cell)) __gen_constructor_JettonData$totalSupply_mintable_owner_content_walletCode(int totalSupply, int mintable, slice owner, cell content, cell walletCode) inline {
     return (totalSupply, mintable, owner, content, walletCode);
 }
 
-(int, int, slice, cell, cell) $__gen_jetton_minter_get_jetton_data((slice, int, cell, int, int, int) $self) impure inline_ref {
-    var (($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'price_weight, $self'tempValue)) = $self;
-    cell $code = __gen_StateInit_get_code(($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'price_weight, $self'tempValue)~$__gen_jetton_minter_getJettonWalletInit(my_address()));
+(int, int, slice, cell, cell) $__gen_jetton_minter_get_jetton_data((slice, int, cell, int, int, int, int) $self) impure inline_ref {
+    var (($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'weight, $self'days_expire, $self'start_unix)) = $self;
+    cell $code = __gen_StateInit_get_code(($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'weight, $self'days_expire, $self'start_unix)~$__gen_jetton_minter_getJettonWalletInit(my_address()));
     return __gen_constructor_JettonData$totalSupply_mintable_owner_content_walletCode($self'total_supply, $self'mintable, $self'owner_address, $self'content, $code);
 }
 
@@ -365,9 +385,9 @@ _ $__gen_get_get_jetton_data() method_id(106029) {
     return __gen_JettonData_to_external(res);
 }
 
-slice $__gen_jetton_minter_get_wallet_address((slice, int, cell, int, int, int) $self, slice $owner) impure inline_ref {
-    var (($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'price_weight, $self'tempValue)) = $self;
-    var ($winit'code, $winit'data) = ($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'price_weight, $self'tempValue)~$__gen_jetton_minter_getJettonWalletInit($owner);
+slice $__gen_jetton_minter_get_wallet_address((slice, int, cell, int, int, int, int) $self, slice $owner) impure inline_ref {
+    var (($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'weight, $self'days_expire, $self'start_unix)) = $self;
+    var ($winit'code, $winit'data) = ($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'weight, $self'days_expire, $self'start_unix)~$__gen_jetton_minter_getJettonWalletInit($owner);
     return $contractAddress(($winit'code, $winit'data));
 }
 
@@ -378,38 +398,28 @@ _ $__gen_get_get_wallet_address(slice $$owner) method_id(103289) {
     return res;
 }
 
-int $__gen_jetton_minter_tempValue((slice, int, cell, int, int, int) $self) impure inline_ref {
-    var (($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'price_weight, $self'tempValue)) = $self;
-    return $self'tempValue;
-}
-
-_ $__gen_get_tempValue() method_id(81098) {
-    var self = __gen_load_jetton_minter();
-    var res = $__gen_jetton_minter_tempValue(self);
-    return res;
-}
-
-(((slice, int, cell, int, int, int)), ()) $__gen_jetton_minter_receive_Mint((slice, int, cell, int, int, int) $self, (int) $msg) impure inline {
-    var ($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'price_weight, $self'tempValue) = $self;
+(((slice, int, cell, int, int, int, int)), ()) $__gen_jetton_minter_receive_Mint((slice, int, cell, int, int, int, int) $self, (int) $msg) impure inline {
+    var ($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'weight, $self'days_expire, $self'start_unix) = $self;
     var ($msg'amount) = $msg;
     var ($ctx'bounced, $ctx'sender, $ctx'value, $ctx'raw) = __tact_context_get();
-    ($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'price_weight, $self'tempValue)~$__gen_jetton_minter_mint($ctx'sender, $msg'amount);
-    return (($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'price_weight, $self'tempValue), ());
+    throw_unless(1524, (((now() - $self'start_unix) / 86400) <= $self'days_expire));
+    ($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'weight, $self'days_expire, $self'start_unix)~$__gen_jetton_minter_mint($ctx'sender, $msg'amount);
+    return (($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'weight, $self'days_expire, $self'start_unix), ());
 }
 
 ((int, slice, int, int, cell, cell, cell)) __gen_constructor_SendParameters$to_value_bounce_mode_body(slice to, int value, int bounce, int mode, cell body) inline {
     return (bounce, to, value, mode, body, null(), null());
 }
 
-((slice, int, cell, int, int, int), ()) $__gen_jetton_minter_receive_comment_d444c32f9b395e87f1c1b3b67293318d7418509039e1ba5fe84d366e3dbf5614((slice, int, cell, int, int, int) $self) impure inline {
-    var ($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'price_weight, $self'tempValue) = $self;
+((slice, int, cell, int, int, int, int), ()) $__gen_jetton_minter_receive_comment_250b76e2b9576fc6b4c45129483006b0003a0c39b6f7ae413d177f4e3479dbca((slice, int, cell, int, int, int, int) $self) impure inline {
+    var ($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'weight, $self'days_expire, $self'start_unix) = $self;
     var ($ctx'bounced, $ctx'sender, $ctx'value, $ctx'raw) = __tact_context_get();
     throw_unless(47422, __tact_address_eq($ctx'sender, $self'owner_address));
     $send(__gen_constructor_SendParameters$to_value_bounce_mode_body($ctx'sender, 0, false, 128, $__gen_String_asComment(__gen_str_3364490128())));
-    return (($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'price_weight, $self'tempValue), ());
+    return (($self'owner_address, $self'total_supply, $self'content, $self'mintable, $self'weight, $self'days_expire, $self'start_unix), ());
 }
 
-((slice, int, cell, int, int, int), int) __gen_router_jetton_minter((slice, int, cell, int, int, int) self, int msg_bounced, slice in_msg) impure inline_ref {
+((slice, int, cell, int, int, int, int), int) __gen_router_jetton_minter((slice, int, cell, int, int, int, int) self, int msg_bounced, slice in_msg) impure inline_ref {
     
     ;; Parse incoming message
     int op = 0;
@@ -433,9 +443,9 @@ _ $__gen_get_tempValue() method_id(81098) {
     if (op == 0) {
         var text_op = slice_hash(in_msg);
         
-        ;; Receive "W" message
-        if (text_op == 0xd444c32f9b395e87f1c1b3b67293318d7418509039e1ba5fe84d366e3dbf5614) {
-            self~$__gen_jetton_minter_receive_comment_d444c32f9b395e87f1c1b3b67293318d7418509039e1ba5fe84d366e3dbf5614();
+        ;; Receive "Withdraw" message
+        if (text_op == 0x250b76e2b9576fc6b4c45129483006b0003a0c39b6f7ae413d177f4e3479dbca) {
+            self~$__gen_jetton_minter_receive_comment_250b76e2b9576fc6b4c45129483006b0003a0c39b6f7ae413d177f4e3479dbca();
             return (self, true);
         }
     }
@@ -476,7 +486,7 @@ _ supported_interfaces() method_id {
 }
 
 _ get_abi_ipfs() {
-    return "ipfs://QmWfGXkHkkYD9QYd4nDs451LzKBomZUkiWGiPLq6ZCVU6H";
+    return "ipfs://QmPyajW9SpcyGzoviPZf9emqYwawmp154nVS3NRFjaaAXU";
 }
 
 _ lazy_deployment_completed() {

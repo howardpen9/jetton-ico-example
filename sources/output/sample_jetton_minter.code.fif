@@ -33,6 +33,8 @@ PROGRAM{
   DECLPROC $contractAddress
   DECLPROC $send
   DECLPROC $__gen_String_asComment
+  DECLPROC $__gen_jetton_minter_get_end_date
+  102605 DECLMETHOD $__gen_get_get_end_date
   DECLPROC __gen_constructor_SendParameters$to_value_bounce_mode_body_code_data
   DECLPROC __gen_constructor_TokenTransferInternal$queryId_amount_from_response_destination_forward_ton_amount_forward_payload
   DECLPROC $__gen_jetton_minter_msgValue
@@ -44,11 +46,9 @@ PROGRAM{
   106029 DECLMETHOD $__gen_get_get_jetton_data
   DECLPROC $__gen_jetton_minter_get_wallet_address
   103289 DECLMETHOD $__gen_get_get_wallet_address
-  DECLPROC $__gen_jetton_minter_tempValue
-  81098 DECLMETHOD $__gen_get_tempValue
   DECLPROC $__gen_jetton_minter_receive_Mint
   DECLPROC __gen_constructor_SendParameters$to_value_bounce_mode_body
-  DECLPROC $__gen_jetton_minter_receive_comment_d444c32f9b395e87f1c1b3b67293318d7418509039e1ba5fe84d366e3dbf5614
+  DECLPROC $__gen_jetton_minter_receive_comment_250b76e2b9576fc6b4c45129483006b0003a0c39b6f7ae413d177f4e3479dbca
   DECLPROC __gen_router_jetton_minter
   DECLPROC recv_internal
   113617 DECLMETHOD supported_interfaces
@@ -282,25 +282,47 @@ PROGRAM{
     ENDC
   }>
   __gen_write_jetton_minter PROCINLINE:<{
-    s6 s5 XCHG2
+    s7 s6 XCHG2
     __tact_store_address INLINECALLDICT
-    s1 s3 XCHG
-    32 STU
+    s1 s4 XCHG
+    128 STU
+    s1 s2 XCHG
     STREF
     1 STI
+    257 PUSHINT
+    STIX
     s1 s2 XCHG
-    32 STU
-    32 STU
+    257 PUSHINT
+    STIX
+    SWAP
+    NEWC
+    257 PUSHINT
+    STIX
+    ENDC
+    SWAP
+    STREF
   }>
   __gen_read_jetton_minter PROCINLINE:<{
     __tact_load_address INLINECALLDICT
     SWAP
-    32 LDU
+    128 LDU
     LDREF
     1 LDI
-    32 LDU
-    32 LDU
-    6 -ROLL
+    257 PUSHINT
+    LDIX
+    257 PUSHINT
+    LDIX
+    LDREF
+    SWAP
+    CTOS
+    257 PUSHINT
+    LDIX
+    DROP
+    s1 s7 XCHG
+    s1 s6 XCHG
+    s1 s5 XCHG
+    s1 s4 XCHG
+    s3 s3 s0 XCHG3
   }>
   __gen_StateInit_get_code PROCINLINE:<{
     DROP
@@ -313,7 +335,9 @@ PROGRAM{
     LDREF
     257 PUSHINT
     LDIX
-    3 -ROLL
+    257 PUSHINT
+    LDIX
+    4 -ROLL
   }>
   __gen_write_$init$JettonWallet PROCINLINE:<{
     -ROT
@@ -323,9 +347,10 @@ PROGRAM{
   }>
   $__gen_jetton_minter_init PROCREF:<{
     0 PUSHINT
-    s2 s0 s2 XCPUXC
+    s0 s3 XCHG
     FALSE
-    s0 s2 XCHG
+    2SWAP
+    1670000000 PUSHINT
   }>
   __gen_load_jetton_minter PROCINLINE:<{
     c4 PUSH
@@ -337,7 +362,7 @@ PROGRAM{
     SWAP
     IF:<{
       __gen_read_jetton_minter INLINECALLDICT
-      1 6 BLKDROP2
+      1 7 BLKDROP2
     }>ELSE<{
       MYADDR
       11 PLDU
@@ -345,9 +370,9 @@ PROGRAM{
       EQUAL
       137 THROWIFNOT
       __gen_read_$init$jetton_minter INLINECALLDICT
-      s0 s3 XCHG
+      s0 s4 XCHG
       ENDS
-      ROT
+      3 ROLL
       $__gen_jetton_minter_init INLINECALLDICT
     }>
   }>
@@ -359,7 +384,7 @@ PROGRAM{
     TRUE
     SWAP
     1 STI
-    6 -ROLL
+    7 -ROLL
     __gen_write_jetton_minter INLINECALLDICT
     ENDC
     c4 POP
@@ -485,6 +510,18 @@ PROGRAM{
     __tact_string_builder_append INLINECALLDICT
     __tact_string_builder_end INLINECALLDICT
   }>
+  $__gen_jetton_minter_get_end_date PROCREF:<{
+    s5 s6 XCHG2
+    5 BLKDROP
+    86400 PUSHINT
+    SWAP
+    MUL
+    ADD
+  }>
+  $__gen_get_get_end_date PROC:<{
+    __gen_load_jetton_minter INLINECALLDICT
+    $__gen_jetton_minter_get_end_date INLINECALLDICT
+  }>
   __gen_constructor_SendParameters$to_value_bounce_mode_body_code_data PROCINLINE:<{
     s4 s6 XCHG
     s4 s5 XCHG
@@ -540,23 +577,38 @@ PROGRAM{
     __tact_context_get INLINECALLDICT
     s1 s3 XCHG
     3 BLKDROP
-    s6 s8 XCHG
-    5 4 REVERSE
-    s3 s7 XCHG
-    s8 s7 s0 XCHG3
+    s7 s9 XCHG
+    5 5 REVERSE
+    s4 s8 XCHG
+    s3 s9 XCHG
+    s8 s9 s0 XCHG3
     $__gen_jetton_minter_msgValue INLINECALLDICT
-    NIP
-    s6 s1 PUSH2
+    s9 s3 PUSH2
     MUL
-    s5 s5 XCPU
+    s10 PUSH
+    15 MULCONST
+    1000 PUSHINT
+    DIV
+    3172 PUSHINT
+    s12 s1 PUSH2
     ADD
-    s5 s6 XCHG
-    4 -ROLL
-    s6 s8 XCPU
+    s4 s(-1) PUXC
+    GEQ
+    THROWANYIFNOT
+    s8 s1 XCPU
+    ADD
+    s6 s9 XCHG
+    s0 s5 XCHG
+    s4 s7 XCHG
+    s3 s9 XCHG
+    s0 s7 s9 XCHG3
+    s10 PUSH
     $__gen_jetton_minter_getJettonWalletInit INLINECALLDICT
     2DUP
     $contractAddress INLINECALLDICT
-    s9 s10 XCPU
+    s12 s14 XCHG2
+    SUB
+    s0 s10 XCHG2
     SUB
     TRUE
     1 PUSHINT
@@ -565,27 +617,28 @@ PROGRAM{
     OVER
     $emptySlice INLINECALLDICT
     s3 s5 XCHG
-    s4 16 s() XCHG
+    s4 s14 XCHG
     s2 s3 XCHG
     s2 17 s() XCHG
     __gen_constructor_TokenTransferInternal$queryId_amount_from_response_destination_forward_ton_amount_forward_payload INLINECALLDICT
     __gen_writecell_TokenTransferInternal INLINECALLDICT
-    s6 s10 XCHG
+    s6 s13 XCHG
     s1 s5 XCHG
     s4 s12 XCHG
-    s3 s11 XCHG
-    s11 s2 XCHG2
+    s3 s9 XCHG
+    s0 s10 s11 XCHG3
     __gen_constructor_SendParameters$to_value_bounce_mode_body_code_data INLINECALLDICT
     $send INLINECALLDICT
-    s5 s1 s3 XCHG3
-    s4 s2 XCHG2
+    s5 s5 s5 XCHG3
+    s0 s6 XCHG
+    s0 s4 XCHG
   }>
   __gen_constructor_JettonData$totalSupply_mintable_owner_content_walletCode PROCINLINE:<{
   }>
   $__gen_jetton_minter_get_jetton_data PROCREF:<{
     MYADDR
     $__gen_jetton_minter_getJettonWalletInit INLINECALLDICT
-    2 2 BLKDROP2
+    3 2 BLKDROP2
     __gen_StateInit_get_code INLINECALLDICT
     s1 s3 XCHG
     s4 s4 s0 XCHG3
@@ -598,26 +651,27 @@ PROGRAM{
   }>
   $__gen_jetton_minter_get_wallet_address PROCREF:<{
     $__gen_jetton_minter_getJettonWalletInit INLINECALLDICT
-    6 2 BLKDROP2
+    7 2 BLKDROP2
     $contractAddress INLINECALLDICT
   }>
   $__gen_get_get_wallet_address PROC:<{
     __tact_verify_address INLINECALLDICT
     __gen_load_jetton_minter INLINECALLDICT
-    6 ROLL
+    7 ROLL
     $__gen_jetton_minter_get_wallet_address INLINECALLDICT
-  }>
-  $__gen_jetton_minter_tempValue PROCREF:<{
-    5 1 BLKDROP2
-  }>
-  $__gen_get_tempValue PROC:<{
-    __gen_load_jetton_minter INLINECALLDICT
-    $__gen_jetton_minter_tempValue INLINECALLDICT
   }>
   $__gen_jetton_minter_receive_Mint PROCINLINE:<{
     __tact_context_get INLINECALLDICT
     s2 s3 XCHG
     3 BLKDROP
+    NOW
+    s3 PUSH
+    SUB
+    86400 PUSHINT
+    DIV
+    s4 PUSH
+    LEQ
+    1524 THROWIFNOT
     SWAP
     $__gen_jetton_minter_mint INLINECALLDICT
   }>
@@ -627,12 +681,12 @@ PROGRAM{
     PUSHNULL
     PUSHNULL
   }>
-  $__gen_jetton_minter_receive_comment_d444c32f9b395e87f1c1b3b67293318d7418509039e1ba5fe84d366e3dbf5614 PROCINLINE:<{
+  $__gen_jetton_minter_receive_comment_250b76e2b9576fc6b4c45129483006b0003a0c39b6f7ae413d177f4e3479dbca PROCINLINE:<{
     __tact_context_get INLINECALLDICT
     s2 s3 XCHG
     3 BLKDROP
     47422 PUSHINT
-    s1 s7 PUSH2
+    s1 s8 PUSH2
     __tact_address_eq INLINECALLDICT
     THROWANYIFNOT
     0 PUSHINT
@@ -674,10 +728,10 @@ PROGRAM{
     0 EQINT
     IF:<{
       HASHSU
-      96011816624059527539655947835217848665797587412415834555929041811551941514772 PUSHINT
+      16755831233829029960236183814598340968099579476287469518633057839499026488266 PUSHINT
       EQUAL
       IFJMP:<{
-        $__gen_jetton_minter_receive_comment_d444c32f9b395e87f1c1b3b67293318d7418509039e1ba5fe84d366e3dbf5614 INLINECALLDICT
+        $__gen_jetton_minter_receive_comment_250b76e2b9576fc6b4c45129483006b0003a0c39b6f7ae413d177f4e3479dbca INLINECALLDICT
         TRUE
         RETALT
       }>
@@ -710,7 +764,7 @@ PROGRAM{
     s0 s2 XCHG
     __tact_context_sender SETGLOB
     __gen_load_jetton_minter INLINECALLDICT
-    2 6 BLKSWAP
+    2 7 BLKSWAP
     __gen_router_jetton_minter INLINECALLDICT
     DROP
     __gen_store_jetton_minter INLINECALLDICT
@@ -722,7 +776,7 @@ PROGRAM{
     209474421377847335869795010607481022628 PUSHINT
   }>
   get_abi_ipfs PROC:<{
-    x{697066733a2f2f516d576647586b486b6b594439515964346e44733435314c7a4b426f6d5a556b69574769504c71365a4356553648} PUSHSLICE
+    x{697066733a2f2f516d5079616a573953706379477a6f7669505a6639656d71597761776d703135346e5653334e52466a6161415855} PUSHSLICE
   }>
   lazy_deployment_completed PROC:<{
     c4 PUSH
